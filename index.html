@@ -2,190 +2,130 @@
 <html>
 <head>
     <title>Performance Dashboard</title>
-    <meta http-equiv="refresh" content="1800">
+    <meta http-equiv="refresh" content="1800"> <!-- Refresh every 30 minutes -->
     <style>
+        /* Ensure the page takes up the full screen */
         html, body {
             margin: 0;
             padding: 0;
             overflow: hidden;
             background: #F5F7FB;
+            display: flex;
             width: 100vw;
             height: 100vh;
+        }
+
+        /* Left Panel (Date, Time, Weather, Ticker) */
+        .left-panel {
+            width: 100px;
+            height: 100vh;
+            background: #F5F7FB;
+            color: #000000;
             font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
-        .iframe-container {
-            flex: 1;
+        /* Date Display */
+        .date-box {
+            font-size: 10px; /*20*/
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Time Display */
+        .time-box {
+            font-size: 14px;/*40*/
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Weather Display */
+        .weather-box {
+            text-align: center;
+            font-size: 12px;/*22*/
+        }
+        .weather-icon {
+            width: 80px;
+            height: 80px;
+        }
+        .city-name {
+            font-size: 12px;/*18*/
+            font-weight: bold;
+        }
+        
+         /* Ticker (Scrolling text) */
+         .ticker-container {
+            overflow: hidden;
+            /* height: 150px; */
+            height: 350px;
             width: 100%;
+            position: relative;
+        }
+
+        .ticker-text {
+            position: absolute;
+            width: 100%;
+            bottom: 1520; /*Start from the bottom */
+            animation: scrollUp 10s linear infinite;
+        }
+
+        @keyframes scrollUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(-100%); }
+        }
+
+        /* Google Slides iframe container */
+        .iframe-container {
+            flex-grow: 1;
+            height: 100vh;
+            position: relative;
             background: #F5F7FB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         iframe {
             width: 100%;
             height: 100%;
             border: none;
-        }
-
-        /* .bottom-panel {
-            width: 100%;
-            height: 65px;
-            background: #F5F7FB;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 2px solid #ccc;
-            box-sizing: border-box;
-            padding: 0 20px;
-            position: relative;
-        } */
-
-        /* Bottom Panel */
-        .bottom-panel {
-            width: 100%;
-            height: 55px; /* Or whatever slim height you're using */
-            background: #ccd9e8; /* Updated background color */
-            color: #000000;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            box-sizing: border-box;
-        }
-
-        .date-time {
-            font-size: 12px;
-            font-weight: bold;
-            text-align: left;
-        }
-
-        .ticker-container {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60%;
-            overflow: hidden;
-            white-space: nowrap;
-            height: 100%;
-            display: flex;
-            align-items: center;
-        }
-
-        .ticker-text {
-            display: inline-block;
-            white-space: nowrap;
-            animation: scrollLeft 35s linear infinite;
-            font-size: 20px;
-            /* font-weight: bold; */
-            /* color: #222; */
-            font-weight: 900; /* Bolder font */
-            color: #003366; /* Deep blue color */
-        }
-
-        @keyframes scrollLeft {
-            0%   { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-
-        .weather-box {
-            display: flex;
-            align-items: center;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .weather-icon {
-            margin-right: 10px;
-        }
-
-        .weather-icon img {
-            width: 35px;
-            height: 35px;
-        }
-
-        .weather-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
+            background: transparent;
         }
     </style>
-</head>
-<body>
-
-    <!-- Looker Studio Iframe Area -->
-    <div class="iframe-container">
-        <iframe id="lookerFrame" src="" allowfullscreen></iframe>
-    </div>
-
-    <!-- Bottom Panel -->
-    <div class="bottom-panel">
-        <!-- Date & Time -->
-        <div class="date-time">
-            <div id="dateBox">Loading date...</div>
-            <div id="timeBox">Loading time...</div>
-        </div>
-
-        <!-- Ticker -->
-        <div class="ticker-container">
-            <div class="ticker-text">
-                ⚠️ Attention: Please ensure machines are inspected by 8 AM daily | 🛠 Maintenance window tonight at 10 PM | 🎯 Target yield this week: 92% | 🚨 Safety reminder: PPE is mandatory in all sections
-            </div>
-        </div>
-
-        <!-- Weather -->
-        <div class="weather-box">
-            <div class="weather-icon">
-                <img id="weatherIcon" src="" alt="Weather Icon">
-            </div>
-            <div class="weather-text">
-                <div id="cityName">Loading...</div>
-                <div id="weatherTemp">--°C</div>
-                <div id="weatherDesc">Loading...</div>
-            </div>
-        </div>
-    </div>
 
     <script>
-        const pageIDs = [
-            "page/p_jhaldr8ird",
-            "page/BGGGF",
-            "page/p_y5rjvcqdrd",
-            "page/p_le1e2jakrd",
-            "page/p_isyaxnjnrd",
-            "page/p_xrzzgkuprd",
-            "page/p_17lkqgqqrd",
-            "page/p_s578cjqqrd",
-            "page/p_vyx726tprd",
-            // "page/p_5pf5vd8krd",
-            // "page/p_2ioud4vprd",
-            "page/p_fwcxl2jmrd",
-            "page/p_ohe31rrprd"
-        ];
-        const baseURL = "https://lookerstudio.google.com/embed/reporting/a567d9d3-a904-43f4-a783-2a6f2fcc4933";
-        // const baseURL = "https://lookerstudio.google.com/embed/reporting/a567d9d3-a904-43f4-a783-2a6f2fcc4933/page/p_ohe31rrprd"
-        let currentPage = 0;
-
-        function rotateSlides() {
-            const iframe = document.getElementById("lookerFrame");
-            const fullURL = `${baseURL}/${pageIDs[currentPage]}?t=${Date.now()}`;
-            iframe.src = fullURL;
-            currentPage = (currentPage + 1) % pageIDs.length;
-        }
-
+        // Function to update time and date
         function updateTime() {
+            const timeBox = document.getElementById("timeBox");
+            const dateBox = document.getElementById("dateBox");
+
             const now = new Date();
+
+            // Format date as "Saturday, March 29, 2025"
             const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
-            document.getElementById("dateBox").innerText = now.toLocaleDateString('en-US', options);
-            document.getElementById("timeBox").innerText = now.toLocaleTimeString('en-US');
+            dateBox.innerHTML = now.toLocaleDateString('en-US', options);
+
+            // Update time
+            timeBox.innerHTML = now.toLocaleTimeString();
         }
 
+        // Function to update Google Slides iframe
+        function updateIframe() {
+            var iframe = document.getElementById("slidesFrame");
+            var url = "https://docs.google.com/presentation/d/e/2PACX-1vRT65UebP7HTr_Fd7gKpB84KVzUGvcsw2e_1fiut-R0xRQ8NbRhH0PqlFc9Lj28ybGrW5eZmUldmo6Z/embed?start=true&loop=true&delayms=15000";
+            iframe.src = url + "&t=" + new Date().getTime(); // Force refresh
+        }
+
+        // Function to fetch weather data
         function fetchWeather() {
-            const apiKey = "85158e35e52890edf18936f969fded80";
+            const apiKey = "85158e35e52890edf18936f969fded80"; 
             const city = "Katunayaka";
-            const units = "metric";
+            const units = "metric"; 
             const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${units}&appid=${apiKey}`;
 
             fetch(url)
@@ -203,22 +143,55 @@
                     }
                 })
                 .catch(error => {
-                    console.error("Weather error:", error);
+                    console.error("Error fetching weather:", error);
                     document.getElementById("cityName").innerText = "City Unavailable";
                     document.getElementById("weatherTemp").innerText = "N/A";
                     document.getElementById("weatherDesc").innerText = "Weather unavailable";
                 });
         }
 
+        // Ensure all scripts run after DOM is loaded
         document.addEventListener("DOMContentLoaded", () => {
             updateTime();
-            setInterval(updateTime, 1000);
+            setInterval(updateTime, 1000); // Update time every second
+
+            updateIframe();
+            setInterval(updateIframe, 900000); // Refresh iframe every 35 (35000) sec
+
             fetchWeather();
-            setInterval(fetchWeather, 600000); // every 10 mins
-            rotateSlides();
-            // setInterval(rotateSlides, 10000); // every 10 seconds
-            setInterval(rotateSlides, 15000); // every 10 seconds
+            setInterval(fetchWeather, 600000); // Update weather every 10 min
         });
+
     </script>
+</head>
+<body>
+    <!-- Left Panel: Date, Time, Weather & Ticker -->
+    <div class="left-panel">
+        <!-- Date Display -->
+        <div id="dateBox" class="date-box"></div>
+
+        <!-- Time Display -->
+        <div id="timeBox" class="time-box"></div>
+
+        <!-- Weather Section -->
+        <div class="weather-box">
+            <div id="cityName" class="city-name">Loading...</div> <!-- City Name -->
+            <img id="weatherIcon" class="weather-icon" src="" alt="Weather Icon">
+            <div id="weatherTemp">--°C</div>
+            <div id="weatherDesc">Loading...</div>
+        </div>
+
+        <!-- Scrolling Text Ticker -->
+        <div class="ticker-container">
+            <div class="ticker-text">
+                Important Notice: System maintenance at 10 PM. Please save your work. 🚀
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel: Google Slides -->
+    <div class="iframe-container">
+        <iframe id="slidesFrame" src="" allowfullscreen="true"></iframe>
+    </div>
 </body>
 </html>
